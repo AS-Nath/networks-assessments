@@ -11,6 +11,15 @@ int locate_msb(uint64_t n) {
     return p; 
 }
 
+void print_binary(uint64_t n) {
+    int idx = locate_msb(n); 
+    while (idx > -1) {
+        printf("%" PRIu64, ((n >> idx) & 1));
+        idx -= 1;  
+    }
+    printf("\n"); 
+}
+
 uint16_t generate_remainder(uint64_t message, uint32_t generator) {
     int msb = locate_msb(message); 
     int window = msb - 16; 
@@ -48,7 +57,9 @@ int main(void) {
     scanf("%" SCNu64, &message); 
     scanf("%" SCNu32, &generator); 
     message <<= 16; // CRC-16 code
+    print_binary(message); 
     message = transmit(message, generator);  
+    print_binary(message); 
     //corrupt(&message, 2); 
     int status = receive(message, generator); 
     if (status) {
