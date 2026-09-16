@@ -60,15 +60,14 @@ uint64_t transmit(uint64_t message) {
     return encoded; 
 }
 
-int receive(uint64_t message, int numparity) {
-    int totalcap = locate_msb(message);
+int receive(uint64_t message, int numparity, int totalcap) {
     int max_original = totalcap - numparity;  
     int currshift = 1; 
     uint8_t syndrome = 0; 
     for (int current_place = 0; current_place < numparity; current_place++) {
         uint64_t current_xor = 0; 
         for (int i = 1; i <= totalcap + 1; i++) {
-            if (i & (1 << current_place)) {
+            if (i & (1ULL << current_place)) {
                 current_xor ^= ((message >> (i - 1)) & 1); 
             }
         }
@@ -80,7 +79,7 @@ int receive(uint64_t message, int numparity) {
     }
     else {
         printf("Bit %d\n", syndrome); 
-        message ^= (1 << (syndrome - 1));
+        message ^= (1ULL << (syndrome - 1));
         printf("%" PRIu64 "\n", message); 
         uint64_t original = 0;
         int data_idx = 0;
@@ -99,9 +98,10 @@ int main(void) {
     uint64_t message; 
     scanf("%" SCNu64, &message); 
     int parity = eval_parity(message); 
+    int totalcap = locate_msb(message) + parity; 
     message = transmit(message); 
     corrupt(&message, 5); 
-    int status = receive(message, parity); 
+    int status = receive(message, parity, totalcap); 
     if (status) {
         printf("Received!\n"); 
     }
